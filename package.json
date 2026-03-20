@@ -1,0 +1,21 @@
+{
+  "name": "aktiviteettigeneraattori-kirjausj-rjestelm-",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/henrysuomela/Aktiviteettigeneraattori-kirjausj-rjestelm-.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/henrysuomela/Aktiviteettigeneraattori-kirjausj-rjestelm-/issues"
+  },
+  "homepage": "https://github.com/henrysuomela/Aktiviteettigeneraattori-kirjausj-rjestelm-#readme"
+}
