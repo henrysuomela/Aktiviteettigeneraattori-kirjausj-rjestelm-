@@ -21,6 +21,10 @@
   "homepage": "https://github.com/henrysuomela/Aktiviteettigeneraattori-kirjausj-rjestelm-#readme",
   "dependencies": {
     "express": "^5.2.1",
-    "jest": "^30.3.0"
+    "jest": "^30.3.0",
+    "typescript": "^5.9.3"
+  },
+  "devDependencies": {
+    "@types/node": "^25.5.0"
   }
 }
