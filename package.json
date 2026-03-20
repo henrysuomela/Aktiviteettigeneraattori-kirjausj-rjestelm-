@@ -2,9 +2,9 @@
   "name": "aktiviteettigeneraattori-kirjausj-rjestelm-",
   "version": "1.0.0",
   "description": "",
-  "main": "index.ts",
+  "main": "index.js",
   "scripts": {
-    "start": "run index.ts",
+    "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
