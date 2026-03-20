@@ -17,5 +17,8 @@
   "bugs": {
     "url": "https://github.com/henrysuomela/Aktiviteettigeneraattori-kirjausj-rjestelm-/issues"
   },
-  "homepage": "https://github.com/henrysuomela/Aktiviteettigeneraattori-kirjausj-rjestelm-#readme"
+  "homepage": "https://github.com/henrysuomela/Aktiviteettigeneraattori-kirjausj-rjestelm-#readme",
+  "dependencies": {
+    "express": "^5.2.1"
+  }
 }
