@@ -5,6 +5,7 @@ import suggestionsRouter from './routes/suggestions.js';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import type { Request, Response, NextFunction } from 'express';
 const app : express.Application = express();
 
 app.use(express.json());
@@ -22,6 +23,11 @@ fs.readdirSync(routesPath).forEach(async file => {
     const route : any = await import(new URL(`file://${routeFilePath}`).href);
     app.use(routeName, route.default);
   }
+});
+
+app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+  console.error(err.stack);
+  res.status(500).json({ error: 'Internal server error' });
 });
 
 export default app;
