@@ -2,6 +2,8 @@ import express from 'express';
 import activitiesRouter from './routes/activities.js';
 import categoriesRouter from './routes/categories.js';
 import suggestionsRouter from './routes/suggestions.js';
+import authRouter from './routes/auth.js';
+import { authenticate } from './middleware/authenticate.js';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -10,20 +12,22 @@ const app : express.Application = express();
 
 app.use(express.json());
 
+app.use('/auth', authRouter);
 /*app.use('/activities', activitiesRouter);
 app.use('/categories', categoriesRouter);
 app.use('/suggestions', suggestionsRouter);*/
 const __filename : string = fileURLToPath(import.meta.url);
 const __dirname : string = path.dirname(__filename);
 const routesPath : string = path.join(__dirname, 'routes');
-fs.readdirSync(routesPath).forEach(async file => {
-  if (file.endsWith(".js")) {
-    const routeName : string = "/" + file.replace(".js", "");
-    const routeFilePath : string = path.join(routesPath, file);
-    const route : any = await import(new URL(`file://${routeFilePath}`).href);
-    app.use(routeName, route.default);
+const files = fs.readdirSync(routesPath);
+for (const file of files) {
+  if (file.endsWith('.js') && file !== 'auth.js') {
+    const routeName = '/' + file.replace('.js', '');
+    const routeFilePath = path.join(routesPath, file);
+    const route = await import(new URL(`file://${routeFilePath}`).href);
+    app.use(routeName, authenticate, route.default);
   }
-});
+}
 
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   console.error(err.stack);
