@@ -1,0 +1,30 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+  url = env("DATABASE_URL") 
+}
+model Activity {
+    id: number;
+    name: string;
+    categoryId: number @relation(fields: [categoryId], references: [id]);
+    createdAt: Date;
+}
+model Category {
+    id: number;
+    name: string;
+}
+model User {
+    id: number;
+    name: string;
+    email: string;
+    password: string;
+}
