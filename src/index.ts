@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { env } from 'process';
 import app from './server.js'
 

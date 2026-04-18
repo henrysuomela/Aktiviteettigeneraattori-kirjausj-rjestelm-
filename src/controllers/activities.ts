@@ -1,17 +1,19 @@
 import type { Request, Response, NextFunction } from 'express';
+import type { AuthenticationRequest } from '../middleware/authenticate.js';
 
-export const createActivity = async (req: Request, res: Response) => {
+export const createActivity = async (req: AuthenticationRequest, res: Response, next: NextFunction) => {
     const { name, categoryId } = req.body;
 };
 
-export const getAllActivities = async (req: Request, res: Response) => {
+export const getAllActivities = async (req: AuthenticationRequest, res: Response, next: NextFunction) => {
 
 };
 
-export const getActivityById = async (req: Request, res: Response, next: NextFunction) => {
+export const getActivityById = async (req: AuthenticationRequest, res: Response, next: NextFunction) => {
     try {
+        const userId = req.user?.id;
         const { id } = req.params;
-        const activity = await //haetaan databasesta
+        const activity = await //haetaan databasesta id:n perusteella
         if (!activity.rows[0]) {
             res.status(404).json({ error: 'Activity not found' });
             return;
@@ -23,14 +25,16 @@ export const getActivityById = async (req: Request, res: Response, next: NextFun
     }
 };
 
-export const deleteActivity = async (req: Request, res: Response, next: NextFunction) => {
+export const deleteActivity = async (req: AuthenticationRequest, res: Response, next: NextFunction) => {
     try {
+        const userId = req.user?.id;
         const { id } = req.params;
-        const activity = await //haetaan databasesta
+        const activity = await //haetaan databasesta id:n perusteella
         if (!activity.rows[0]) {
-            res.status(404).json({ 'Activity not found' });
+            res.status(404).json({ error: 'Activity not found' });
             return;
         }
+        await //poistetaan activity databasesta
         res.status(200).json({ message: 'Activity deleted succesfully' });
     }
     catch (error) {
