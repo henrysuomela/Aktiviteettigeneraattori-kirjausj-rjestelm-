@@ -3,36 +3,36 @@
 
 // Get a free hosted Postgres database in seconds: `npx create-db`
 
-generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
-}
+generator client {  
+  provider = "prisma-client-js"  
+}  
 
-datasource db {
-  provider = "sqlite"
-  url = env("DATABASE_URL") 
-}
+datasource db {  
+  provider = "sqlite"  
+} 
 model Activity {
-    id: number;
-    name: string;
-    categoryId: number @relation(fields: [categoryId], references: [id]);
-    createdAt: Date;
+    id Int @id @default(autoincrement()) 
+    name String
+    category Category @relation(fields: [categoryId], references: [id])
+    categoryId @map("categoryId")
+    createdAt DateTime @default(now())
 }
 model Category {
-    id: number;
-    name: string;
+    id Int @id @default(autoincrement()) 
+    name String
 }
 model User {
-    id: number;
-    name: string;
-    email: string;
-    password: string;
+    id Int @id @default(autoincrement()) 
+    name String
+    email String
+    password String
 }
 model Suggestion {
-    id: number;
-    name: string;
-    categoryId: number @relation(fields: [categoryId], references: [id]);
-    accepted: boolean;
-    createdAt: Date;
+    id Int @id @default(autoincrement()) 
+    name String
+    category Category @relation(fields: [categoryId], references: [id])
+    categoryId @map("categoryId")
+    accepted Boolean
+    createdAt DateTime @default(now())
     
 }
