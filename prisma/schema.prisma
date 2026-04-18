@@ -28,3 +28,11 @@ model User {
     email: string;
     password: string;
 }
+model Suggestion {
+    id: number;
+    name: string;
+    categoryId: number @relation(fields: [categoryId], references: [id]);
+    accepted: boolean;
+    createdAt: Date;
+    
+}
