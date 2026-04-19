@@ -3,3 +3,5 @@ dist/
 .env
 *.db
 /src/generated/prisma
+*.js
+*.map

@@ -1,8 +1,33 @@
 import type { Request, Response, NextFunction } from 'express';
 import type { AuthenticationRequest } from '../middleware/authenticate.js';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
 
 export const createActivity = async (req: AuthenticationRequest, res: Response, next: NextFunction) => {
     const { name, categoryId } = req.body;
+    try {
+        const userId = req.user?.id;
+        if (!userId) {
+            res.status(401).json({ error: 'Unauthorized' });
+            return;
+        }
+        if (!name || !categoryId) {
+            res.status(400).json({ error: 'Name and categoryId are required' });
+            return;
+        }
+        const activity = await prisma.activity.create({
+            data: {
+                name,
+                categoryId,
+                userId
+            }
+        });
+        res.status(201).json(activity);
+    }
+    catch (error) {
+        next(error);
+    }
 };
 
 export const getAllActivities = async (req: AuthenticationRequest, res: Response, next: NextFunction) => {
