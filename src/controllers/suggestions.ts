@@ -1,12 +1,36 @@
 import type { Request, Response, NextFunction } from 'express';
 import type { AuthenticationRequest } from '../middleware/authenticate.js';
-
+import { PrismaClient } from '@prisma/client/extension';
+const prisma = new PrismaClient();
 export const getAllSuggestions = async (req: AuthenticationRequest, res: Response, next: NextFunction) => {
+    try {
+        const suggestions = await prisma.suggestion.findMany();
+        res.status(200).json(suggestions);
+    }
+    catch (error) {
+        next(error);
+    }
 
 };
 
 export const generateSuggestion = async (req: AuthenticationRequest, res: Response, next: NextFunction) => {
     const { categoryId } = req.body;
+    try {
+        if (!categoryId) {
+            res.status(400).json({ error: 'Category ID is required' });
+            return;
+        }
+        const newSuggestion = await prisma.suggestion.create({
+            data: {
+                categoryId,
+                userId: req.user?.id || 0,
+                accepted: false
+            }
+        });
+        res.status(201).json(newSuggestion);
+}    catch (error) {
+        next(error);
+    }
 };
 
 export const getSuggestionById = async (req: AuthenticationRequest, res: Response, next: NextFunction) => {

@@ -1,8 +1,15 @@
 import type { Request, Response, NextFunction } from 'express';
 import type { AuthenticationRequest } from '../middleware/authenticate.js';
-
+import {PrismaClient} from '@prisma/client/extension';
+const prisma = new PrismaClient();
 export const getAllCategories = async (req: AuthenticationRequest, res: Response, next: NextFunction) => {
-  
+    try {
+        const categories = await prisma.category.findMany();
+        res.status(200).json(categories);
+    }
+    catch (error) {
+        next(error);
+    }
 };
 
 export const createCategory = async (req: AuthenticationRequest, res: Response, next: NextFunction) => {

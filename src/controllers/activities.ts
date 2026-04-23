@@ -1,6 +1,6 @@
 import type { Request, Response, NextFunction } from 'express';
 import type { AuthenticationRequest } from '../middleware/authenticate.js';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@prisma/client/extension';
 
 const prisma = new PrismaClient();
 
@@ -31,7 +31,15 @@ export const createActivity = async (req: AuthenticationRequest, res: Response, 
 };
 
 export const getAllActivities = async (req: AuthenticationRequest, res: Response, next: NextFunction) => {
-
+    try {
+        const userId = req.user?.id;
+        if (!userId) {
+            res.status(401).json({ error: 'Unauthorized' });
+            return;
+        }
+        const activities = await prisma.activity.findMany();
+        res.status(200).json(activities);
+    }
 };
 
 export const getActivityById = async (req: AuthenticationRequest, res: Response, next: NextFunction) => {
