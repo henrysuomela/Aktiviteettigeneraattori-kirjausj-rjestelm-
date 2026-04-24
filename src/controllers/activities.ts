@@ -1,13 +1,13 @@
-import type { Request, Response, NextFunction } from 'express';
+import type { Response, NextFunction } from 'express';
 import type { AuthenticationRequest } from '../middleware/authenticate.js';
 import { PrismaClient } from '@prisma/client/extension';
 
 const prisma = new PrismaClient();
 
 export const createActivity = async (req: AuthenticationRequest, res: Response, next: NextFunction) => {
-    const { name, categoryId } = req.body;
     try {
         const userId = req.user?.id;
+        const { name, categoryId } = req.body;
         if (!userId) {
             res.status(401).json({ error: 'Unauthorized' });
             return;
@@ -37,8 +37,13 @@ export const getAllActivities = async (req: AuthenticationRequest, res: Response
             res.status(401).json({ error: 'Unauthorized' });
             return;
         }
-        const activities = await prisma.activity.findMany();
+        const activities = await prisma.activity.findMany({
+            where: { userId }
+        });
         res.status(200).json(activities);
+    }
+    catch (error) {
+        next(error);
     }
 };
 
@@ -46,12 +51,15 @@ export const getActivityById = async (req: AuthenticationRequest, res: Response,
     try {
         const userId = req.user?.id;
         const { id } = req.params;
-        const activity = await //haetaan databasesta id:n perusteella
-        if (!activity.rows[0]) {
+        const parsedId = parseInt(id as string);
+        const activity = await prisma.activity.findFirst({
+            where: { id: parsedId, userId }
+        });
+        if (!activity) {
             res.status(404).json({ error: 'Activity not found' });
             return;
         }
-        res.status(200).json(activity.rows[0]);
+        res.status(200).json(activity);
     }
     catch (error) {
         next(error);
@@ -62,12 +70,17 @@ export const deleteActivity = async (req: AuthenticationRequest, res: Response, 
     try {
         const userId = req.user?.id;
         const { id } = req.params;
-        const activity = await //haetaan databasesta id:n perusteella
-        if (!activity.rows[0]) {
+        const parsedId = parseInt(id as string);
+        const activity = await prisma.activity.findFirst({
+            where: { id: parsedId, userId }
+        });
+        if (!activity) {
             res.status(404).json({ error: 'Activity not found' });
             return;
         }
-        await //poistetaan activity databasesta
+        await prisma.activity.delete({
+            where: { id: parsedId }
+        });
         res.status(200).json({ message: 'Activity deleted succesfully' });
     }
     catch (error) {

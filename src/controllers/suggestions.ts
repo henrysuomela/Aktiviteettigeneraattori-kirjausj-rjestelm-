@@ -14,8 +14,8 @@ export const getAllSuggestions = async (req: AuthenticationRequest, res: Respons
 };
 
 export const generateSuggestion = async (req: AuthenticationRequest, res: Response, next: NextFunction) => {
-    const { categoryId } = req.body;
     try {
+        const { categoryId } = req.body;
         if (!categoryId) {
             res.status(400).json({ error: 'Category ID is required' });
             return;
@@ -37,12 +37,15 @@ export const getSuggestionById = async (req: AuthenticationRequest, res: Respons
     try {
         const userId = req.user?.id;
         const { id } = req.params;
-        const suggestion = await //haetaan databasesta id:n ja userId:n perusteella
-        if (!suggestion.rows[0]) {
+        const parsedId = parseInt(id as string);
+        const suggestion = await prisma.suggestion.findFirst({
+            where: { id: parsedId, userId }
+        });
+        if (!suggestion) {
             res.status(404).json({ error: 'Suggestion not found' });
             return;
         }
-        res.status(200).json(suggestion.rows[0]);
+        res.status(200).json(suggestion);
     }
     catch (error) {
         next(error);
@@ -53,18 +56,30 @@ export const acceptSuggestion = async (req: AuthenticationRequest, res: Response
     try {
         const userId = req.user?.id;
         const { id } = req.params;
-        const suggestion = await //haetaan databasesta id:n ja userId:n perusteella
-        if (!suggestion.rows[0]) {
+        const parsedId = parseInt(id as string);
+        const suggestion = await prisma.suggestion.findFirst({
+            where: { id: parsedId, userId }
+        });
+        if (!suggestion) {
             res.status(404).json({ error: 'Suggestion not found' });
             return;
         }
-        if (suggestion.rows[0].accepted) {
+        if (suggestion.accepted) {
             res.status(400).json({ error: 'Suggestion already accepted' });
             return;
         }
-        await //päivitetään suggestionin accepted true
-        const newActivity = await //luodaan uus activity databaseen suggestionin pohjalta
-        res.status(201).json(newActivity.rows[0]);
+        await prisma.suggestion.update({
+            where: { id: parsedId },
+            data: { accepted: true }
+        });
+        const newActivity = await prisma.activity.create({
+            data: {
+                name: suggestion.name,
+                categoryId: suggestion.categoryId,
+                userId: userId || 0
+            }
+        });
+        res.status(201).json(newActivity);
     }
     catch (error) {
         next(error);
