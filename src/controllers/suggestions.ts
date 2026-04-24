@@ -4,7 +4,9 @@ import { PrismaClient } from '@prisma/client/extension';
 const prisma = new PrismaClient();
 export const getAllSuggestions = async (req: AuthenticationRequest, res: Response, next: NextFunction) => {
     try {
-        const suggestions = await prisma.suggestion.findMany();
+        const suggestions = await prisma.suggestion.findMany({
+            where: { userId: req.user?.id }
+        });
         res.status(200).json(suggestions);
     }
     catch (error) {
@@ -15,15 +17,35 @@ export const getAllSuggestions = async (req: AuthenticationRequest, res: Respons
 
 export const generateSuggestion = async (req: AuthenticationRequest, res: Response, next: NextFunction) => {
     try {
+        const userId = req.user?.id;
         const { categoryId } = req.body;
         if (!categoryId) {
             res.status(400).json({ error: 'Category ID is required' });
             return;
         }
+
+        // Aktiviteettien määrä annetussa kategoriassa
+        const count = await prisma.suggestion.count({
+            where: { categoryId, userId: null }
+        });
+
+        if (count === 0) {
+            res.status(404).json({ error: 'No suggestions available for this category' });
+            return;
+        }
+
+        // Valitaan aktiviteetti randomilla
+        const randomSkip = Math.floor(Math.random() * count);
+        const poolSuggestion = await prisma.suggestion.findFirst({
+            where: { categoryId, userId: null },
+            skip: randomSkip
+        });
+
         const newSuggestion = await prisma.suggestion.create({
             data: {
+                name: poolSuggestion!.name,
                 categoryId,
-                userId: req.user?.id || 0,
+                userId,
                 accepted: false
             }
         });
