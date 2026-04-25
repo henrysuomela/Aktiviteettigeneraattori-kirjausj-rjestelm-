@@ -14,14 +14,15 @@ export const getAllCategories = async (req: AuthenticationRequest, res: Response
 
 export const createCategory = async (req: AuthenticationRequest, res: Response, next: NextFunction) => {
     try {
-        const userId = req.user?.id;
         const { name } = req.body;
         if (!name) {
             res.status(400).json({ error: 'Name is required' });
             return;
         }
-        const newCategory = await //luodaan kategoria databaseen userId:lle
-        res.status(201).json(newCategory.rows[0]);
+        const newCategory = await prisma.category.create({
+            data: { name }
+        });
+        res.status(201).json(newCategory);
     }
     catch (error) {
         next(error);
@@ -30,14 +31,16 @@ export const createCategory = async (req: AuthenticationRequest, res: Response, 
 
 export const getCategoryById = async (req: AuthenticationRequest, res: Response, next: NextFunction) => {
     try {
-        const userId = req.user?.id;
         const { id } = req.params;
-        const category = await //haetaan databasesta id:n ja userId:n perusteella
-        if (!category.rows[0]) {
+        const parsedId = parseInt(id as string);
+        const category = await prisma.category.findFirst({
+            where: { id: parsedId }
+        });
+        if (!category) {
             res.status(404).json({ error: 'Category not found' });
             return;
         }
-        res.status(200).json(category.rows[0]);
+        res.status(200).json(category);
     }
     catch (error) {
         next(error);
