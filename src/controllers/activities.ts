@@ -37,9 +37,7 @@ export const getAllActivities = async (req: AuthenticationRequest, res: Response
             res.status(401).json({ error: 'Unauthorized' });
             return;
         }
-        const activities = await prisma.activity.findMany({
-            where: { userId }
-        });
+        const activities = await prisma.activity.findMany();
         res.status(200).json(activities);
     }
     catch (error) {
