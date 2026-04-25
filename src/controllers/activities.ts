@@ -1,9 +1,6 @@
 import type { Response, NextFunction } from 'express';
 import type { AuthenticationRequest } from '../middleware/authenticate.js';
-import { PrismaClient } from '@prisma/client/extension';
-
-const prisma = new PrismaClient();
-
+import { prisma } from '../lib/prisma.js';
 export const createActivity = async (req: AuthenticationRequest, res: Response, next: NextFunction) => {
     try {
         const userId = req.user?.id;

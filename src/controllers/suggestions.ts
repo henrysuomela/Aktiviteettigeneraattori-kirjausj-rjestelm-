@@ -1,7 +1,6 @@
 import type { Request, Response, NextFunction } from 'express';
 import type { AuthenticationRequest } from '../middleware/authenticate.js';
-import { PrismaClient } from '@prisma/client/extension';
-const prisma = new PrismaClient();
+import { prisma } from '../lib/prisma.js';
 export const getAllSuggestions = async (req: AuthenticationRequest, res: Response, next: NextFunction) => {
     try {
         const suggestions = await prisma.suggestion.findMany({
