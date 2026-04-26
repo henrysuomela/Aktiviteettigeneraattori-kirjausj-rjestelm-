@@ -21,8 +21,8 @@ const __dirname : string = path.dirname(__filename);
 const routesPath : string = path.join(__dirname, 'routes');
 const files = fs.readdirSync(routesPath);
 for (const file of files) {
-  if (file.endsWith('.js') && file !== 'auth.js') {
-    const routeName = '/' + file.replace('.js', '');
+  if (file.endsWith('.ts') && file !== 'auth.ts') {
+    const routeName = '/' + file.replace('.ts', '');
     const routeFilePath = path.join(routesPath, file);
     const route = await import(new URL(`file://${routeFilePath}`).href);
     app.use(routeName, authenticate, route.default);
