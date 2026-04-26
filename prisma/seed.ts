@@ -8,15 +8,15 @@ async function main() {
   });
 
   const luova = await prisma.category.upsert({
-    where: { name: 'luova' },
+    where: { name: 'Luova' },
     update: {},
-    create: { name: 'luova' }
+    create: { name: 'Luova' }
   });
 
   const sosiaalinen = await prisma.category.upsert({
-    where: { name: 'sosiaalinen' },
+    where: { name: 'Sosiaalinen' },
     update: {},
-    create: { name: 'sosiaalinen' }
+    create: { name: 'Sosiaalinen' }
   });
 
 
