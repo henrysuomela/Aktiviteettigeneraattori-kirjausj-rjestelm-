@@ -1,10 +1,15 @@
-import type { Request, Response, NextFunction } from 'express';
+import type { Response, NextFunction } from 'express';
 import type { AuthenticationRequest } from '../middleware/authenticate.js';
 import { prisma } from '../lib/prisma.js';
 export const getAllSuggestions = async (req: AuthenticationRequest, res: Response, next: NextFunction) => {
     try {
+        const userId = req.user?.id;
+        if (!userId) {
+            res.status(401).json({ error: 'Unauthorized' });
+            return;
+        }
         const suggestions = await prisma.suggestion.findMany({
-            where: { userId: req.user?.id }
+            where: { userId }
         });
         res.status(200).json(suggestions);
     }
@@ -17,15 +22,20 @@ export const getAllSuggestions = async (req: AuthenticationRequest, res: Respons
 export const generateSuggestion = async (req: AuthenticationRequest, res: Response, next: NextFunction) => {
     try {
         const userId = req.user?.id;
+        if (!userId) {
+            res.status(401).json({ error: 'Unauthorized' });
+            return;
+        }
         const { categoryId } = req.body;
-        if (!categoryId) {
+        const parsedCategoryId = Number(categoryId);
+        if (!categoryId || Number.isNaN(parsedCategoryId)) {
             res.status(400).json({ error: 'Category ID is required' });
             return;
         }
 
         // Aktiviteettien määrä annetussa kategoriassa
         const count = await prisma.suggestion.count({
-            where: { categoryId, userId: null }
+            where: { categoryId: parsedCategoryId, userId: null }
         });
 
         if (count === 0) {
@@ -36,14 +46,14 @@ export const generateSuggestion = async (req: AuthenticationRequest, res: Respon
         // Valitaan aktiviteetti randomilla
         const randomSkip = Math.floor(Math.random() * count);
         const poolSuggestion = await prisma.suggestion.findFirst({
-            where: { categoryId, userId: null },
+            where: { categoryId: parsedCategoryId, userId: null },
             skip: randomSkip
         });
 
         const newSuggestion = await prisma.suggestion.create({
             data: {
                 name: poolSuggestion!.name,
-                categoryId,
+                categoryId: parsedCategoryId,
                 userId,
                 accepted: false
             }
@@ -57,8 +67,16 @@ export const generateSuggestion = async (req: AuthenticationRequest, res: Respon
 export const getSuggestionById = async (req: AuthenticationRequest, res: Response, next: NextFunction) => {
     try {
         const userId = req.user?.id;
+        if (!userId) {
+            res.status(401).json({ error: 'Unauthorized' });
+            return;
+        }
         const { id } = req.params;
         const parsedId = parseInt(id as string);
+        if (Number.isNaN(parsedId)) {
+            res.status(400).json({ error: 'Invalid suggestion id' });
+            return;
+        }
         const suggestion = await prisma.suggestion.findFirst({
             where: { id: parsedId, userId }
         });
@@ -76,8 +94,16 @@ export const getSuggestionById = async (req: AuthenticationRequest, res: Respons
 export const acceptSuggestion = async (req: AuthenticationRequest, res: Response, next: NextFunction) => {
     try {
         const userId = req.user?.id;
+        if (!userId) {
+            res.status(401).json({ error: 'Unauthorized' });
+            return;
+        }
         const { id } = req.params;
         const parsedId = parseInt(id as string);
+        if (Number.isNaN(parsedId)) {
+            res.status(400).json({ error: 'Invalid suggestion id' });
+            return;
+        }
         const suggestion = await prisma.suggestion.findFirst({
             where: { id: parsedId, userId }
         });
@@ -97,7 +123,7 @@ export const acceptSuggestion = async (req: AuthenticationRequest, res: Response
             data: {
                 name: suggestion.name,
                 categoryId: suggestion.categoryId,
-                userId: userId || 0
+                userId
             }
         });
         res.status(201).json(newActivity);

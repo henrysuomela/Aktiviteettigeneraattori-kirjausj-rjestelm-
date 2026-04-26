@@ -29,12 +29,14 @@ export const createActivity = async (req: AuthenticationRequest, res: Response, 
 
 export const getAllActivities = async (req: AuthenticationRequest, res: Response, next: NextFunction) => {
     try {
-        const userId = req.user?.id;
+        const userId: number = req.user?.id;
         if (!userId) {
             res.status(401).json({ error: 'Unauthorized' });
             return;
         }
-        const activities = await prisma.activity.findMany();
+        const activities = await prisma.activity.findMany({
+            where: { userId }
+        });
         res.status(200).json(activities);
     }
     catch (error) {
@@ -45,8 +47,16 @@ export const getAllActivities = async (req: AuthenticationRequest, res: Response
 export const getActivityById = async (req: AuthenticationRequest, res: Response, next: NextFunction) => {
     try {
         const userId = req.user?.id;
+        if (!userId) {
+            res.status(401).json({ error: 'Unauthorized' });
+            return;
+        }
         const { id } = req.params;
         const parsedId = parseInt(id as string);
+        if (Number.isNaN(parsedId)) {
+            res.status(400).json({ error: 'Invalid activity id' });
+            return;
+        }
         const activity = await prisma.activity.findFirst({
             where: { id: parsedId, userId }
         });
@@ -64,8 +74,16 @@ export const getActivityById = async (req: AuthenticationRequest, res: Response,
 export const deleteActivity = async (req: AuthenticationRequest, res: Response, next: NextFunction) => {
     try {
         const userId = req.user?.id;
+        if (!userId) {
+            res.status(401).json({ error: 'Unauthorized' });
+            return;
+        }
         const { id } = req.params;
         const parsedId = parseInt(id as string);
+        if (Number.isNaN(parsedId)) {
+            res.status(400).json({ error: 'Invalid activity id' });
+            return;
+        }
         const activity = await prisma.activity.findFirst({
             where: { id: parsedId, userId }
         });
